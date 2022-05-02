@@ -1,46 +1,39 @@
-import { hash,compare } from 'bcryptjs'
-import {Request, Response} from 'express'
+import { hash, compare } from 'bcryptjs'
+import { Request, Response } from 'express'
 import { IAuthentication, IUser } from '../interface/IUser'
 import { prismaClient } from '../database/prismaClient'
 import { sign } from 'jsonwebtoken'
-import config from "../config"
+import config from '../config'
 
-const generateToken = (params:string)=>sign(params,config.SECRET,{expiresIn: 30})
-
+const generateToken = (params:string) => sign(params, config.SECRET, { expiresIn: 30 })
 export class AuthController {
-
-  async register(request:Request,response:Response){
-    const {name,email,password}:IUser = request.body
-
-    const new_password = await hash(password,10) 
-
+  async register (request:Request, response:Response) {
+    const { name, email, password } :IUser = request.body
+    const newPassword = await hash(password, 10)
     await prismaClient.user.create({
-      data:{
+      data: {
         email,
         name,
-        password:new_password}
+        password: newPassword
+      }
     })
 
     return response.status(201).json()
   }
 
-  async authentication(request:Request,response:Response){
-    const {email, password}:IAuthentication = request.body
+  async authentication (request:Request, response:Response) {
+    const { email, password }:IAuthentication = request.body
 
-    let exist_email = await prismaClient.user.findFirst({where:{email}})
+    const existEmail = await prismaClient.user.findFirst({ where: { email } })
 
-    if(!exist_email)
+    if (!existEmail) {
       return response.status(400).json('Incorrect email and/or password!')
+    }
 
-    compare(password, exist_email.password,(err,result)=>{
-      if(!result)
-        return response.status(400).json('Incorrect email and/or password!')
-    })
+    compare(password, existEmail.password)
 
-    const token = generateToken(exist_email.id)
+    const token = generateToken(existEmail.id)
 
-    return response.status(200).json({...exist_email,token:`Bearer ${token}`})
-    
+    return response.status(200).json({ ...existEmail, token: `Bearer ${token}` })
   }
-  
 }

@@ -7,12 +7,10 @@ const {
   SECRET
 } = process.env
 
-
 const config = {
   PORT,
-  DATABASE_URL:String(DATABASE_URL),
-  SECRET:String(SECRET)
+  DATABASE_URL: String(DATABASE_URL),
+  SECRET: String(SECRET)
 }
 
 export default config
-
