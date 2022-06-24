@@ -19,12 +19,12 @@ export const Authenticated = () => {
       const { exp }:any = decode(token)
 
       if (exp < (new Date().getTime() + 1) / 1000) {
-        return response.status(401).json({ error: 'Token is missing' });
+        return response.status(401).json({ error: 'Token is missing' })
       }
 
       return _next()
     } catch (error) {
-      return response.status(400).end();
+      return response.status(400).end()
     }
   }
 }
