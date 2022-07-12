@@ -9,7 +9,13 @@ export const Authenticated = () => {
     if (!authHeaders) {
       return response.status(401).json({ error: 'Token is missing' })
     }
-    const [token] = authHeaders.split(' ')
+
+    const [bearer, token] = authHeaders.split(' ')
+
+    if (bearer !== 'Bearer') {
+      return response.status(401).json({ error: 'Token is missing' })
+    }
+
     try {
       verify(token, config.SECRET, (err, decoded) => {
         if (err) {

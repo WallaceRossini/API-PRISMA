@@ -5,7 +5,7 @@ import { prismaClient } from '../database/prismaClient'
 import { sign } from 'jsonwebtoken'
 import config from '../config'
 
-const generateToken = (params:string) => sign(params, config.SECRET, { expiresIn: 30 })
+// const generateToken = (params:string) => sign(params, config.SECRET, { expiresIn: 30 })
 export class AuthController {
   async register (request:Request, response:Response) {
     const { name, email, password } :IUser = request.body
@@ -32,7 +32,7 @@ export class AuthController {
 
     compare(password, existEmail.password)
 
-    const token = generateToken(existEmail.id)
+    const token = sign({ id: existEmail.id }, config.SECRET, { expiresIn: '1m' })
 
     return response.status(200).json({ ...existEmail, token: `Bearer ${token}` })
   }
